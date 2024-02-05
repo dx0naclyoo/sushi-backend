@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from src.sushiapp.database import HOST, PORT, USER_NAME, USER_PASSWORD, DB_NAME
-from src.sushiapp.tables import Base
+from sushiapp.database import HOST, PORT, USER_NAME, USER_PASSWORD, DB_NAME
+from sushiapp.tables import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

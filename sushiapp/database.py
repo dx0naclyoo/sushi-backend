@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 import os
-from sushiapp.settings import setting
+from sushiapp.settings import settings
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, async_scoped_session, AsyncSession
 from sqlalchemy import exc
@@ -41,7 +41,7 @@ class DatabaseWorker:
             await session.close()
 
 
-databaseworker = DatabaseWorker(url=DATABASE_URL, echo=setting.echo)
+databaseworker = DatabaseWorker(url=DATABASE_URL, echo=settings.echo)
 
 
 

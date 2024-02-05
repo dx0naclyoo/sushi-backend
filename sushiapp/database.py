@@ -1,10 +1,10 @@
-from contextlib import asynccontextmanager
-from dotenv import load_dotenv
 import os
-from sushiapp.settings import settings
+from asyncio import current_task
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, async_scoped_session, AsyncSession
-from sqlalchemy import exc
+from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, async_scoped_session
+
+from sushiapp.settings import settings
 
 load_dotenv()
 
@@ -23,20 +23,28 @@ DATABASE_URL = f"postgresql+asyncpg://{USER_NAME}:{USER_PASSWORD}@{HOST}:{PORT}/
 class DatabaseWorker:
     def __init__(self, url: str, echo: bool = False) -> None:
         self.engine = create_async_engine(url, echo=echo)
-        self.session_factory = async_sessionmaker(self.engine, autoflush=False, autocommit=False,
+        self.session_factory = async_sessionmaker(bind=self.engine,
+                                                  autoflush=False,
+                                                  autocommit=False,
                                                   expire_on_commit=False)
 
-    @asynccontextmanager
-    async def get_session(self):
+    def get_scoped_session(self):
+        session = async_scoped_session(
+            session_factory=self.session_factory,
+            scopefunc=current_task
+        )
+        return session
 
-        session: AsyncSession = self.session_factory()
-        try:
-            yield session
-        except exc.SQLAlchemyError as error:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
+    # Don't use this function, better use "session_scoped_dependency"
+    # async def session_dependency(self) -> AsyncSession:
+    #     async with self.session_factory() as session:
+    #         yield session
+    #         await session.close()
+
+    async def session_scoped_dependency(self) -> AsyncSession:
+        session = self.get_scoped_session()
+        yield session
+        await session.close()
 
 
 databaseworker = DatabaseWorker(url=DATABASE_URL, echo=settings.echo)

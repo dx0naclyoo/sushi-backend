@@ -7,8 +7,8 @@
 .idea/workspace.xml
 .idea/inspectionProfiles/profiles_settings.xml
 /__pycashe__/
-src/sushiapp/__pycache__/app.cpython-310.pyc
-src/sushiapp/__pycache__/settings.cpython-310.pyc
+/sushiapp/__pycache__/app.cpython-310.pyc
+/sushiapp/__pycache__/settings.cpython-310.pyc
 
 __pycache__/
 *.py[cod]

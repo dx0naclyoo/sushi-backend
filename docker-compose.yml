@@ -11,6 +11,6 @@ services:
     ports:
       - "5432:5432"
 
-
+# Убрал на время из за ошибки монтирования на windows
 #    volumes:
 #      - ./database:/var/lib/postgresql/data/

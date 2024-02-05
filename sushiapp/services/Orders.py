@@ -24,9 +24,3 @@ async def create_order(session: AsyncSession, order_data: models_order.OrderCrea
     # await session.refresh(order)
     return order
 
-# async def main():
-#     async with databaseworker.session_dependency() as session:
-#         pass
-#
-# if __name__ == '__main__':
-#     asyncio.run(main())

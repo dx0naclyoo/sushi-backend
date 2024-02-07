@@ -1,40 +1,64 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import sushiapp.models.Orders as Orders_models
-import sushiapp.services.Orders as Orders_services
+import sushiapp.services.Orders as services
 from sushiapp.database import databaseworker
+from sushiapp.models.Orders import OrderCreate, Order, OrderUpdate
+import sushiapp.tables as tables
+import sushiapp.models.Auth as models_Auth
+from sushiapp.services.Auth import get_current_user
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
 
-@router.get("/", response_model=list[Orders_models.Order])
-async def get_orders(
-        session: AsyncSession = Depends(databaseworker.session_scoped_dependency),
-
-):
-    return await Orders_services.get_orders(session=session)
-
-
-@router.get("/{order_id}", response_model=Orders_models.Order)
+@router.get("/{id}", response_model=Order)
 async def get_order(
         order_id: int,
-        session: AsyncSession = Depends(databaseworker.session_scoped_dependency),
-
+        user: models_Auth.User = Depends(get_current_user),
+        session: AsyncSession = Depends(databaseworker.get_session)
 ):
-    order = await Orders_services.get_order(session=session, order_id=order_id)
-    if order is not None:
-        return order
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Order {order_id} not found"
-    )
+    return await services.get_order(session=session, order_id=order_id, user_id=user.id)
 
 
-@router.post("/", response_model=Orders_models.Order)
+@router.get("/", response_model=list[Order])
+async def get_all_order(
+        user: models_Auth.User = Depends(get_current_user),
+        session: AsyncSession = Depends(databaseworker.get_session)
+):
+    return await services.get_orders(session=session, user_id=user.id)
+
+
+@router.post("/", response_model=Order)
 async def create_order(
-        order_data: Orders_models.OrderCreate,
-        session: AsyncSession = Depends(databaseworker.session_scoped_dependency),
+        data: OrderCreate,
+        user: models_Auth.User = Depends(get_current_user),
+        session: AsyncSession = Depends(databaseworker.get_session)
 ):
-    return await Orders_services.create_order(session=session, order_data=order_data)
+    return await services.create_order(session=session, order_data=data, user_id=user.id)
+
+
+@router.put("/{id}", response_model=Order)
+async def update_order(
+        order_id: int,
+        data: OrderUpdate,
+        user: models_Auth.User = Depends(get_current_user),
+        session: AsyncSession = Depends(databaseworker.get_session)
+):
+    return await services.update_order(session=session, order_data=data, order_id=order_id, user_id=user.id)
+
+
+@router.delete("/{id}")
+async def delete_order(
+        order_ip: int,
+        user: models_Auth.User = Depends(get_current_user),
+        session: AsyncSession = Depends(databaseworker.get_session)
+):
+    return await services.delete_order(order_id=order_ip, session=session, user_id=user.id)
+
+
+
+
+
+
+
+

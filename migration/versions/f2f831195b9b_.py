@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: cb0bda60196e
+Revision ID: f2f831195b9b
 Revises: 
-Create Date: 2024-02-05 08:18:56.613943
+Create Date: 2024-02-07 17:35:41.864305
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'cb0bda60196e'
+revision: str = 'f2f831195b9b'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,9 +35,8 @@ def upgrade() -> None:
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.String(length=20), nullable=False),
+    sa.Column('username', sa.String(length=20), nullable=False),
     sa.Column('password', sa.String(length=255), nullable=False),
-    sa.Column('registration_date', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('categories_products',
@@ -49,8 +48,7 @@ def upgrade() -> None:
     )
     op.create_table('orders',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('kind', sa.String(), nullable=False),
-    sa.Column('amount', sa.Float(), nullable=False),
+    sa.Column('cost', sa.Float(), nullable=False),
     sa.Column('description', sa.Text(), nullable=False),
     sa.Column('data', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),

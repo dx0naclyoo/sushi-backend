@@ -1,10 +1,8 @@
-from datetime import datetime
 from pydantic import BaseModel
 
 
 class BaseUser(BaseModel):
-    name: str
-    registration_data: datetime
+    username: str
 
 
 class User(BaseUser):
@@ -16,6 +14,9 @@ class User(BaseUser):
 
 class CreateUser(BaseUser):
     password: str
+
+    class Config:
+        from_attributes = True
 
 
 class Token(BaseModel):

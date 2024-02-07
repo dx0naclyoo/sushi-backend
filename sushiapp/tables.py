@@ -20,10 +20,9 @@ class Users(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    name: Mapped[str] = mapped_column(String(20), nullable=False)
+    username: Mapped[str] = mapped_column(String(20), nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
-    registration_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now())
+    registration_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     orders: Mapped["Orders"] = relationship(back_populates="user")
 
@@ -33,8 +32,7 @@ class Orders(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    kind: Mapped[str] = mapped_column(sqlalchemy.String, nullable=False)
-    amount: Mapped[float] = mapped_column(sqlalchemy.Float, nullable=False)
+    cost: Mapped[float] = mapped_column(sqlalchemy.Float, nullable=False)
     description: Mapped[str] = mapped_column(sqlalchemy.Text)
     data: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now())

@@ -1,33 +1,30 @@
-from datetime import date
-from typing import Optional
+from datetime import datetime
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict
-
-
-class OrdersBase(BaseModel):
-    amount: float
-    description: Optional[str]
-    data: date
+from annotated_types import MaxLen
+from pydantic import BaseModel
 
 
-class Order(OrdersBase):
-    model_config = ConfigDict(from_attributes=True)
+class BaseOrder(BaseModel):
+    cost: int
+    description: Annotated[str, MaxLen(200)]
+    data: datetime  # yyyy-MM-DD
+
+
+class Order(BaseOrder):
+    id: int
+
+
+class OrderCreate(BaseOrder):
     pass
 
 
-class OrderCreate(OrdersBase):
-    user_id: int
+class OrderUpdate(BaseOrder):
 
-# class Orders(Base):
-#     __tablename__ = "orders"
-#
-#     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-#
-#     kind: Mapped[str] = mapped_column(sqlalchemy.String, nullable=False)
-#     amount: Mapped[float] = mapped_column(sqlalchemy.Float, nullable=False)
-#     description: Mapped[str] = mapped_column(sqlalchemy.Text)
-#     data: Mapped[datetime] = mapped_column(
-#         DateTime(timezone=True), server_default=func.now())
-#
-#     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-#     user: Mapped["Users"] = relationship(back_populates="orders")
+    class Config:
+        from_attributes = True
+
+# cost: Mapped[float] = mapped_column(sqlalchemy.Float, nullable=False)
+# description: Mapped[str] = mapped_column(sqlalchemy.Text)
+# data: Mapped[datetime] = mapped_column(
+#     DateTime(timezone=True), server_default=func.now())

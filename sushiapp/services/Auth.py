@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import sushiapp.models.Auth as models_Auth
 import sushiapp.tables as tables
 from sushiapp.settings import settings
+from sushiapp.tables import Users
 
 oauth_schema = OAuth2PasswordBearer(tokenUrl='/api/v1/auth/sign-in')
 
@@ -127,3 +128,30 @@ async def authenticate_user(
         raise exceptions
 
     return create_token(user)
+
+
+async def change_role(
+        user_id: int, new_role: tables.UserRole, user_role: tables.UserRole,
+        session: AsyncSession
+) -> tables.Users:
+
+    stmt = select(tables.Users).where(tables.Users.id == user_id)
+    res = await session.execute(stmt)
+    new_user = res.scalar()
+
+    if user_role == tables.UserRole.ADMIN:
+        new_user.role = new_role
+        await session.commit()
+        await session.refresh(new_user)
+
+        return new_user
+
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only administrators can update role"
+        )
+
+
+
+

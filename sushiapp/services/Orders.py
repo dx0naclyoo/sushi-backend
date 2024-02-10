@@ -12,7 +12,7 @@ async def _get(user_id: int, session: AsyncSession, order_id: int) -> tables.Ord
                    .scalar(select(tables.Orders)
                            .where(tables.Orders.id == order_id and tables.Orders.user_id == user_id)))
     if not order:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Operation not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
     return order
 
 

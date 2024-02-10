@@ -1,12 +1,9 @@
-from typing import List
 from datetime import datetime
+from enum import Enum
 
 import sqlalchemy
-from sqlalchemy import String, TIMESTAMP, DateTime, func, ForeignKey, create_engine
+from sqlalchemy import String, TIMESTAMP, DateTime, func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
-
-from dotenv import load_dotenv
-import os
 
 
 class Base(DeclarativeBase):
@@ -15,14 +12,21 @@ class Base(DeclarativeBase):
     }
 
 
+class UserRole(str, Enum):
+    ADMIN = "admin"
+    USER = "user"
+
+
 class Users(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    username: Mapped[str] = mapped_column(String(20), nullable=False)
+    username: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     registration_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    role: Mapped["UserRole"] = mapped_column(String, nullable=False, default=UserRole.USER)
 
     orders: Mapped["Orders"] = relationship(back_populates="user")
 
@@ -45,21 +49,22 @@ class Products(Base):
     __tablename__ = "products"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(sqlalchemy.String(50))
-    price: Mapped[int] = mapped_column(sqlalchemy.Float)
+
+    name: Mapped[str] = mapped_column(sqlalchemy.String(50), unique=True)
+    price: Mapped[float] = mapped_column(sqlalchemy.Float)
     description: Mapped[str] = mapped_column(sqlalchemy.String)
-    weight: Mapped[int] = mapped_column(sqlalchemy.Float)
+    weight: Mapped[float] = mapped_column(sqlalchemy.Float)
 
     categories: Mapped[list["Categories"]] = relationship(back_populates="products",
                                                           uselist=True,
                                                           secondary="categories_products")
 
-
+# Добавить неповторяющиеся имена для категорий
 class Categories(Base):
     __tablename__ = "categories"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(50))
+    name: Mapped[str] = mapped_column(String(50), unique=True)
 
     products: Mapped[list["Products"]] = relationship(back_populates="categories",
                                                       uselist=True,
@@ -71,3 +76,18 @@ class CategoriesProducts(Base):  # Secondary table for link Products & Categorie
 
     catogories_fk = mapped_column(ForeignKey("categories.id"), primary_key=True)
     products_fk = mapped_column(ForeignKey("products.id"), primary_key=True)
+
+
+class UserProducts(Base): # Secondary table for link Products & Categories for Favorite products
+    __tablename__ = "users_products"
+
+    users_fk = mapped_column(ForeignKey("users.id"), primary_key=True)
+    products_fk = mapped_column(ForeignKey("products.id"), primary_key=True)
+
+
+
+
+
+
+
+

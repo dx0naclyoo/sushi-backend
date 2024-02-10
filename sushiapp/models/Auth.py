@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from sushiapp.tables import UserRole
 
 
 class BaseUser(BaseModel):
@@ -7,6 +8,7 @@ class BaseUser(BaseModel):
 
 class User(BaseUser):
     id: int
+    role: UserRole
 
     class Config:
         from_attributes = True
